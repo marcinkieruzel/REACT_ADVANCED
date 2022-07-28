@@ -1,5 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
+import { useEffect, useState } from "react";
 
 const questions = [
   {
@@ -68,9 +69,81 @@ const questions = [
 ];
 
 function App() {
+  const [questionNumber, setQuestionNumber] = useState(0);
+  const [userAnswers, setUSerAnswers] = useState([]);
+  const [counter, setCounter] = useState(20);
+
+  useEffect(() => {
+    
+    let ctr = 20;
+    
+    const timeout = setInterval(() => {
+
+      if (ctr <= 0) {
+        clearInterval(timeout);
+        
+      } 
+      setCounter(ctr)
+      ctr--
+      
+    }, 1000);
+
+    return () => {
+      clearInterval(timeout);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (userAnswers.length && userAnswers.length < questions.length) {
+      setQuestionNumber((prev) => prev + 1);
+    }
+  }, [userAnswers]);
+
+  const handleUserAnswer = (correct) => {
+    setUSerAnswers((prev) => {
+      const alreadyAnswered = prev.find(
+        (x) => x.questionNumber === questionNumber
+      );
+
+      if (alreadyAnswered) {
+        return prev;
+      }
+
+      return [
+        ...prev,
+        {
+          questionNumber,
+          correct,
+        },
+      ];
+    });
+
+    // console.log(userAnswers);
+    // setQuestionNumber((prev) => prev + 1);
+  };
+
   return (
     <div className="App">
-      
+      <h1>{questions[questionNumber].question}</h1>
+      {questions[questionNumber].answers.map((x, i) => {
+        return (
+          <button
+            disabled={counter <= 0}
+            onClick={() => {
+              handleUserAnswer(x.correct);
+            }}
+            key={i}
+          >
+            {x.option}
+          </button>
+        );
+      })}
+
+      <h2>
+        Wynik: {userAnswers.filter((x) => x.correct).length} /{" "}
+        {userAnswers.length}
+      </h2>
+      <h3>{counter}</h3>
     </div>
   );
 }
