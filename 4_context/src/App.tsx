@@ -23,13 +23,13 @@ function App() {
     })();
   }, []);
 
-  const priceOfItems = reduce(
+  const priceOfItems = React.useMemo(() => reduce(
     cartContext.cart,
     (r: number, v: CartItem) => {
       return r + v.count * v.price;
     },
     0
-  );
+  ), [cartContext.cart]);
 
   return (
     <div className="App">
